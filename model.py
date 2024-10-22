@@ -2,19 +2,30 @@ import argparse
 import sys
 import os
 import time
+import json
+
+def estimate_price(mileage, theta0, theta1):
+    return theta0 + (theta1 * mileage)
+
+def load_parameters():
+	try:
+		with open('model.json', 'r') as file:
+			parameters = json.load(file)
+			theta0 = parameters.get('theta0', 0)
+			theta1 = parameters.get('theta1', 0)
+	except FileNotFoundError:
+		theta0 = 0
+		theta1 = 0
+	return theta0, theta1
 
 
 def main():
-	parser = argparse.ArgumentParser()
-	parser.add_argument('mileage', help='mileage to check')
-	parser.add_argument('file', help='file to train')
-	parser.add_argument('-g', "--graph", action='store_true', default= False, help='visualize graph')
-	args = parser.parse_args()
+	theta0, theta1 = load_parameters()
 
-	# Parsear los argumentos
-    if not os.path.exists(args.file):
-        print(Fore.RED + "Error. The file dont exist." + Style.RESET_ALL)
-        sys.exit(1)
+	mileage = float(input('Introduce el kilometraje del coche: '))
+	price = estimate_price(mileage, theta0, theta1)
+
+	print(f"El precio estimado del coche es: {price:.2f} euros.")
 
 
 
