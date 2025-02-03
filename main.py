@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-from training import train_model, load_parameters, estimatePrice, mean_absolute_error
+from training import train_model, load_parameters, estimatePrice, absolute_error
 
 def main():
     # Cargar datos
@@ -42,10 +42,26 @@ def main():
         else:
             print("Usando parámetros cargados.")
 
+    if std_x == 0:
+        print("Advertencia: La desviación estándar de los datos es 0. No se puede normalizar correctamente.")
+        std_x = 1  # Evitar división por cero
+
+    if std_y == 0:
+        print("Advertencia: La desviación estándar de los precios es 0. No se puede normalizar correctamente.")
+        std_y = 1  # Evitar división por cero
+
+    # Si los parámetros son 0, predecimos el valor medio del precio para evitar errores
+    def estimatePrice_fixed(mileage, theta0, theta1, mean_x, std_x, mean_y, std_y):
+        if theta0 == 0 and theta1 == 0:
+            return mean_y  # Usar el promedio de los precios si el modelo no ha sido entrenado
+        else:
+            mileage_normalized = (mileage - mean_x) / std_x
+            return (theta0 + theta1 * mileage_normalized) * std_y + mean_y
+
     y_true = price
-    y_pred = [estimatePrice((mileage[i] - mean_x) / std_x, theta0, theta1) * std_y + mean_y for i in range(len(mileage))]
+    y_pred = [estimatePrice((mileage[i] - mean_x) / std_x, theta0, theta1) * std_y + mean_y for i in range(len(mileage))] # se normaliza el kilometraje y se desnormaliza el precio
     print(y_pred)
-    precision = mean_absolute_error(y_true, y_pred)
+    precision = absolute_error(y_true, y_pred)
     percentage = precision / (sum(price) / len(price)) * 100
     print(f"El error promedio es: {precision:.2f}")
     print(f"El modelo tiene un {100 - percentage:.2f}% de precisión.")

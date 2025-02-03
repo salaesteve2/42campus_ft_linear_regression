@@ -13,7 +13,7 @@ def compute_cost(X, y, theta_0, theta_1):
         total_cost += error ** 2
     return total_cost / (2 * m)
 
-def mean_absolute_error(y_true, y_pred):
+def absolute_error(y_true, y_pred):
     """Calcula el Error Absoluto Medio (MAE)"""
     total_error = 0.0
     n = len(y_true)
@@ -71,7 +71,7 @@ def load_parameters(filename='parameters.json'):
                 params['mean_x'], params['std_x'], 
                 params['mean_y'], params['std_y'])
     else:
-        return 0, 0  # Valores predeterminados
+        return 0, 0, 0, 0, 0, 0 # Valores predeterminados
 
 def train_model(mileage, price):
     theta_0 = 0
@@ -83,13 +83,13 @@ def train_model(mileage, price):
     print(mileage)
     print(price)
 
-    mean_x = sum(mileage) / len(mileage)
-    std_x = (sum((xi - mean_x) ** 2 for xi in mileage) / len(mileage)) ** 0.5
+    mean_x = sum(mileage) / len(mileage) # Media del kilometraje
+    std_x = (sum((xi - mean_x) ** 2 for xi in mileage) / len(mileage)) ** 0.5 # Desviación estándar del kilometraje
     mileage_normalized = [(xi - mean_x) / std_x for xi in mileage]
 
-    mean_y = sum(price) / len(price)
-    std_y = (sum((yi - mean_y) ** 2 for yi in price) / len(price)) ** 0.5
-    price_normalized = [(yi - mean_y) / std_y for yi in price]
+    mean_y = sum(price) / len(price) # Media del precio
+    std_y = (sum((yi - mean_y) ** 2 for yi in price) / len(price)) ** 0.5 # Desviación estándar del precio
+    price_normalized = [(yi - mean_y) / std_y for yi in price] # Normalización del precio
 
     theta_0, theta_1 = gradient_descent(mileage_normalized, price_normalized, theta_0, theta_1, learning_rate, iterations)
 
